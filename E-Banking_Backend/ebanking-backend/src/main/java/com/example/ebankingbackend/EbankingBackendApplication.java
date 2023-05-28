@@ -1,5 +1,9 @@
 package com.example.ebankingbackend;
 
+import com.example.ebankingbackend.dtos.BankAccountDTO;
+import com.example.ebankingbackend.dtos.CurrentBankAccountDTO;
+import com.example.ebankingbackend.dtos.CustomerDTO;
+import com.example.ebankingbackend.dtos.SavingBankAccountDTO;
 import com.example.ebankingbackend.entities.*;
 import com.example.ebankingbackend.enums.AccountStatus;
 import com.example.ebankingbackend.enums.OperationType;
@@ -10,6 +14,7 @@ import com.example.ebankingbackend.repositories.AccountOperationRepository;
 import com.example.ebankingbackend.repositories.BankAccountRepository;
 import com.example.ebankingbackend.repositories.CustomerRepository;
 import com.example.ebankingbackend.services.BankAccountService;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,6 +26,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 @SpringBootApplication
+@OpenAPIDefinition
 public class EbankingBackendApplication {
 
     public static void main(String[] args) {
@@ -30,7 +36,7 @@ public class EbankingBackendApplication {
     CommandLineRunner commandLineRunner(BankAccountService bankAccountService){
         return args -> {
             Stream.of("Hamid","Abdslam","Hanane").forEach(name->{
-                Customer customer=new Customer();
+                CustomerDTO customer=new CustomerDTO();
                 customer.setName(name);
                 customer.setEmail(name+"@gmail.com");
                 bankAccountService.saveCustomer(customer);
@@ -40,27 +46,26 @@ public class EbankingBackendApplication {
                 try {
                     bankAccountService.saveCurrentBankAccount(Math.random()*90000,9000,customer.getId());
                     bankAccountService.saveSavingBankAccount(Math.random()*120000,5.5,customer.getId());
-                    List<BankAccount> bankAccounts = bankAccountService.bankAccountList();
-                    for (BankAccount bankAccount:bankAccounts){
-                        for (int i = 0; i <10 ; i++) {
-                            String accountId;
-                            if(bankAccount instanceof SavingAccount){
-                                accountId=((SavingAccount) bankAccount).getId();
-                            } else{
-                                accountId=((CurrentAccount) bankAccount).getId();
-                            }
-                            bankAccountService.credit(accountId,10000+Math.random()*120000,"Credit");
-                            bankAccountService.debit(accountId,1000+Math.random()*9000,"Debit");
-                        }
-                    }
+
 
                 } catch (CustomerNotFoundException e) {
                     e.printStackTrace();
 
-                } catch (BankAccountNotFoundException | BalanceNotSufficientException e) {
-                    throw new RuntimeException(e);
                 }
             });
+            List<BankAccountDTO> bankAccounts = bankAccountService.bankAccountList();
+            for (BankAccountDTO bankAccount:bankAccounts){
+                for (int i = 0; i <10 ; i++) {
+                    String accountId;
+                    if(bankAccount instanceof SavingBankAccountDTO){
+                        accountId=((SavingBankAccountDTO) bankAccount).getId();
+                    } else{
+                        accountId=((CurrentBankAccountDTO) bankAccount).getId();
+                    }
+                    bankAccountService.credit(accountId,10000+Math.random()*120000,"Credit");
+                    bankAccountService.debit(accountId,1000+Math.random()*9000,"Debit");
+                }
+            }
 
         };
     }
@@ -93,7 +98,7 @@ public class EbankingBackendApplication {
                 savingAccount.setCreatedAt(new Date());
                 savingAccount.setStatus(AccountStatus.CREATED);
                 savingAccount.setCustomer(customer);
-                savingAccount.setIntrestRate(5.5);
+                savingAccount.setInterestRate(5.5);
                 bankAccountRepository.save(savingAccount);
             });
             bankAccountRepository.findAll().forEach(bankAcc -> {

@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @DiscriminatorValue("SA")
 @Data @NoArgsConstructor @AllArgsConstructor
 public class SavingAccount extends BankAccount{
-    private double intrestRate;
+    private double interestRate;
 }

@@ -28,7 +28,7 @@ public class BankService {
             if (bankAccount instanceof CurrentAccount) {
                 System.out.println("Over Draft=>" + ((CurrentAccount) bankAccount).getOverDraft());
             } else if (bankAccount instanceof SavingAccount) {
-                System.out.println("Rate=>" + ((SavingAccount) bankAccount).getIntrestRate());
+                System.out.println("Rate=>" + ((SavingAccount) bankAccount).getInterestRate());
             }
             bankAccount.getAccountOperations().forEach(op -> {
                 System.out.println(op.getType() + "\t" + op.getOperationDate() + "\t" + op.getAmount());
