@@ -1,2 +1,0 @@
-# E-Banking
-school project
